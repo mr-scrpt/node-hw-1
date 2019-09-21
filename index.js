@@ -6,28 +6,59 @@ program
   .option('-f, --from <from>', 'расположение файлов', './sources')
   .option('-t, --to <to>', 'куда перенести файлы?', './result');
 program.parse(process.argv);
-console.log(`cheese: ${program.from}`);
-console.log(`cheese: ${program.to}`);
-
 
 
 const dir = {base: program.from, direction: program.to};
-const readDir = (base, level) => {
-  const files = fs.readdirSync(base);
 
-  files.forEach(item => {
-    let localBase = path.join(base, item);
-    let state = fs.statSync(localBase);
-    if (state.isDirectory()) {
-      readDir(localBase, level + 1);
-    } else {
-      dirMaker(getFirstLiter(item));
-      copyFile(item, localBase);
-    }
+const readDir = (base, done) => {
+  fs.readdir(base, (err, files)=>{
+    if (err) return done(err);
+
+    files.forEach(item => {
+      let localBase = path.join(base, item);
+      fs.stat(localBase, (err, stat)=>{
+        if(err) return done(err);
+
+        if (stat.isDirectory()) {
+          readDir(localBase);
+          //delFolder(localBase);
+        } else {
+          dirMaker(getFirstLiter(item));
+          copyFile(item, localBase, delFile);
+        }
+
+      });
+
+    });
 
   });
 
 };
+
+const delFile = (path) =>{
+  fs.unlink(path, (err)=>{
+    if (err) return console.log(`Ошибка ${err}`);
+    console.log(`Удален файл ${path}`);
+  })
+};
+
+/*
+const delFolder = (folder)=> {
+  fs.readdir(folder, (err, files)=>{
+    if (err) return console.log(`Ошибка ${err}`);
+    if (!files.length) {
+      fs.rmdir(folder, (err) => {
+        if (err) return console.log(err);
+        console.log(`Удалена папка ${folder}`);
+      })
+    }
+  })
+};
+*/
+
+
+
+
 
 const getFirstLiter = (string) => {
   return string[0];
@@ -42,10 +73,32 @@ const dirMaker = (name) => {
   }
 };
 
-const copyFile = (file, target) =>{
+const copyFile = (file, target, cb) =>{
+  let cbCelled = false;
   const litera = getFirstLiter(file);
   const dest = path.join( dir.direction, litera, file );
-  fs.copyFileSync(target, dest)
+
+  const rd = fs.createReadStream(target);
+  rd.on('error', err=> console.log(`Ошибка ${err}`));
+
+  const wr = fs.createWriteStream(dest);
+  wr.on('error', err=> console.log(`Ошибка ${err}`))
+    .on('close', () => {
+      console.log(`Файл ${file} скоприован`);
+      cb(target);
+    });
+
+  rd.pipe(wr);
+
+  const done = (err) =>{
+    if(!cbCelled){
+      cb(err);
+      cbCelled = true;
+    }
+  }
+
 };
 
-readDir(dir.base, 0);
+
+
+readDir(dir.base, err=>console.log(err));
