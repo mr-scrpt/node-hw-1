@@ -1,7 +1,17 @@
 const fs = require('fs');
 const path = require('path');
+const program = require('commander');
 
-const dir = {base: './sources', direction: './result'};
+program
+  .option('-f, --from <from>', 'расположение файлов', './sources')
+  .option('-t, --to <to>', 'куда перенести файлы?', './result');
+program.parse(process.argv);
+console.log(`cheese: ${program.from}`);
+console.log(`cheese: ${program.to}`);
+
+
+
+const dir = {base: program.from, direction: program.to};
 const readDir = (base, level) => {
   const files = fs.readdirSync(base);
 
