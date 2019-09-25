@@ -14,6 +14,7 @@ program
   .option('-d, --del <del>', 'Удалять исходники?', false);
 program.parse(process.argv);
 
+console.log(program.del);
 
 const dir = {base: program.from, direction: program.to};
 
@@ -26,7 +27,7 @@ readDir(
     dirMaker(getFirstLiter(fileName), dir.direction);
 
     copyFile(fileName, filePath, dest, ()=> {
-      program.del === true ?  removeFile(filePath) : null;
+      program.del === 'true' ?  removeFile(filePath) : null;
       cb()
     });
 
