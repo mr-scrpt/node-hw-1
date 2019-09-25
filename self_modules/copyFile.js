@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const copyFile = (file, target, dest ,cb) =>{
+const copyFile = (file, target, dest, cb) =>{
   const rd = fs.createReadStream(target);
   rd.on('error', err=> console.log(`Ошибка ${err}`));
 
@@ -8,7 +8,7 @@ const copyFile = (file, target, dest ,cb) =>{
   wr.on('error', err=> console.log(`Ошибка ${err}`))
     .on('close', () => {
       console.log(`Файл ${file} скоприован`);
-      cb(target);
+      cb();
     });
 
   rd.pipe(wr);
