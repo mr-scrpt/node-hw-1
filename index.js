@@ -23,9 +23,9 @@ readDir(
   (filePath, fileName, cb) => {
     const dest = path.join( dir.direction, getFirstLiter(fileName), fileName );
     dirMaker(getFirstLiter(fileName), dir.direction);
-    copyFile(fileName, filePath, dest, ()=> {
-      program.del === 'true' ?  removeFile(filePath) : null;
-      cb()
+    copyFile(fileName, filePath, dest, (err)=> {
+      if(err) return err;
+      program.del === 'true' ?  removeFile(filePath, cb) : cb();
     });
 
   },

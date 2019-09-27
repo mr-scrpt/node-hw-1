@@ -1,9 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 
-
-
-
 const readDir = (base, callbackOnFile, callbackOnFolder, done) => {
   fs.readdir(base, (err, files)=>{
     if (err) return done(err);
