@@ -1,10 +1,10 @@
 const path = require('path');
 const fs = require('fs');
 
-const removeDir = require('./removeDir');
 
 
-const readDir = (base,  callbackOnFile, callbackOnFolder, del,done) => {
+
+const readDir = (base, callbackOnFile, callbackOnFolder, done) => {
   fs.readdir(base, (err, files)=>{
     if (err) return done(err);
     let i = 0;
@@ -24,7 +24,6 @@ const readDir = (base,  callbackOnFile, callbackOnFolder, del,done) => {
             filePath,
             callbackOnFile,
             callbackOnFolder,
-            del,
             next.bind(null, doneList)
           )
         }else {
@@ -36,7 +35,7 @@ const readDir = (base,  callbackOnFile, callbackOnFolder, del,done) => {
 
     next(err => {
       if (!err) callbackOnFolder(base);
-      del === 'true' ? removeDir(base) : null;
+      //del === 'true' ? removeDir(base) : null;
       done(err);
     });
 
